@@ -56,6 +56,21 @@ body {
   border-top: 1px solid var(--border);
   padding: 5px 0 6px;
 }
+.topbar-row3 {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: linear-gradient(90deg,#dcfce7,#bbf7d0);
+  border-top: 1px solid #86efac;
+  margin: 0 -16px;
+  padding: 7px 16px;
+}
+#bannerLabel { font-size: 13px; color: #15803d; font-weight: 600; }
+.banner-btn {
+  background: #16a34a; color: #fff;
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  padding: 6px 14px; border-radius: 20px;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+  white-space: nowrap; box-shadow: 0 1px 4px rgba(22,163,74,.4); flex-shrink: 0;
+}
 .brand { font-size: 17px; font-weight: 700; letter-spacing: .5px; color: var(--accent); }
 .brand span { color: var(--text); font-weight: 300; }
 .brand-switcher { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
@@ -289,13 +304,13 @@ footer {
   <div class="topbar-row2">
     <nav class="nav-tabs" id="navTabs"></nav>
   </div>
-</div>
-<div id="dataBanner" style="background:linear-gradient(90deg,#dcfce7,#bbf7d0); border-bottom:2px solid #86efac; padding:8px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
-  <span id="bannerLabel" style="font-size:12px; color:#15803d; font-weight:600;">📊 ดูข้อมูลดิบ สินค้าควิกโค้ทใน Google Sheets</span>
-  <a id="bannerLink" href="https://docs.google.com/spreadsheets/d/1aKR6KmUGosext5SE1d92VF-CVEHeCJEFfM_IvHE6gzY/edit?gid=246191077#gid=246191077" target="_blank" rel="noopener" style="background:#16a34a;color:#fff;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;box-shadow:0 1px 4px rgba(22,163,74,.4)">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-    เปิด Google Sheet
-  </a>
+  <div id="dataBanner" class="topbar-row3">
+    <span id="bannerLabel">📊 ดูข้อมูลดิบ สินค้าควิกโค้ทใน Google Sheets</span>
+    <a id="bannerLink" href="https://docs.google.com/spreadsheets/d/1aKR6KmUGosext5SE1d92VF-CVEHeCJEFfM_IvHE6gzY/edit?gid=246191077#gid=246191077" target="_blank" rel="noopener" class="banner-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      เปิด Google Sheet
+    </a>
+  </div>
 </div>
 <main id="mainContent"></main>
 <footer id="footerEl">ข้อมูล ณ เดือนพ.ค. 2569 &nbsp;|&nbsp; หน่วย: บาท (ไม่รวม VAT)</footer>
