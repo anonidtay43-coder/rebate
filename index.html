@@ -418,7 +418,28 @@ function parseQCCSV(csvText) {
 
   const last69 = monthlyTotals['2569'].reduce((last, v, m) => v > 0 ? m+1 : last, 0);
 
-  return { products, monthlyTotals, yearlyTotals, lastMonth2569: last69 };
+  // อ่านค่า rebate 2569 จาก row ที่มี 'รวมทั้งหมดได้รีเบท' (row150) และ 'คิดเป็นเปอร์เซ็น' (row151)
+  let rebate2569 = null;
+  for (let ri = 0; ri < rows.length; ri++) {
+    const ra = (rows[ri][0]||'').trim();
+    if (ra.includes('รวมทั้งหมดได้รีเบท') || ra.includes('รีเบท ประมาณ')) {
+      // col D=index3 = current, col E=index4 = proposed
+      const cur  = parseFloat((rows[ri][3]||'').toString().replace(/,/g,'')) || 0;
+      const prop = parseFloat((rows[ri][4]||'').toString().replace(/,/g,'')) || 0;
+      let curP = 0, propP = 0;
+      if (ri+1 < rows.length) {
+        curP  = parseFloat((rows[ri+1][3]||'').toString().replace(/,/g,'')) || 0;
+        propP = parseFloat((rows[ri+1][4]||'').toString().replace(/,/g,'')) || 0;
+      }
+      if (cur > 0 || prop > 0) {
+        rebate2569 = { current: cur, currentPct: curP, proposed: prop, proposedPct: propP };
+        console.log('[QC CSV] rebate2569:', rebate2569);
+      }
+      break;
+    }
+  }
+
+  return { products, monthlyTotals, yearlyTotals, lastMonth2569: last69, rebate2569 };
 }
 
 function buildQCFromEmbed() {
@@ -484,8 +505,8 @@ const qcQuarterlyTotals = {
 const qcRebateSummary = {
   2567:{total:211245,pct:2.076},
   2568:{total:313191,pct:2.647},
-  "2569_current":167309,
-  "2569_proposed":310666,
+  "2569_current":167309,   "2569_current_pct":1.35,
+  "2569_proposed":324333,  "2569_proposed_pct":2.64,
 };
 const qcProducts = [
   {
@@ -735,17 +756,24 @@ function buildPage1() {
   }).join('');
   mRows+=`<tr class="total-row"><td>รวม</td>${mTotCells}<td>–</td></tr>`;
 
+  // ดึงค่า rebate live ถ้ามี ไม่งั้นใช้ embed
+  const liveRb = (qcDataLive && qcDataLive.rebate2569) || {};
+  const rb2569cur   = liveRb.current    || qcRebateSummary['2569_current'];
+  const rb2569curP  = liveRb.currentPct || qcRebateSummary['2569_current_pct'];
+  const rb2569prop  = liveRb.proposed   || qcRebateSummary['2569_proposed'];
+  const rb2569propP = liveRb.proposedPct|| qcRebateSummary['2569_proposed_pct'];
+
   const rebateItems = [
     {label:'รีเบทปี 2567', val:qcRebateSummary[2567].total, pct:qcRebateSummary[2567].pct},
     {label:'รีเบทปี 2568', val:qcRebateSummary[2568].total, pct:qcRebateSummary[2568].pct},
-    {label:'รีเบท 2569 ที่คาดว่าทำได้จริง', val:qcRebateSummary['2569_current'], pct:null},
-    {label:'รีเบท 2569 (ที่กำลังขอพิจารณา)', val:qcRebateSummary['2569_proposed'], pct:null},
+    {label:'รีเบท 2569 ที่คาดว่าทำได้จริง', val:rb2569cur, pct:rb2569curP},
+    {label:'รีเบท 2569 (ที่กำลังขอพิจารณา)', val:rb2569prop, pct:rb2569propP},
   ];
   const rebCards = rebateItems.map(ri=>`
     <div class="rebate-item">
       <div class="r-label">${ri.label}</div>
       <div class="r-val">${fmtM(ri.val)}</div>
-      ${ri.pct?`<div class="r-pct">${ri.pct.toFixed(2)}% ของยอดซื้อ</div>`:''}
+      ${ri.pct!=null?`<div class="r-pct">${Number(ri.pct).toFixed(2)}% ของยอดซื้อ</div>`:''}
     </div>`).join('');
 
   return `
@@ -1607,6 +1635,15 @@ const sikaPageDefs = [
   { id:'sp1', label:'สินค้า N เดือน' },
 ];
 
+// อัปเดต label ปุ่ม "สินค้า N เดือน" ให้แสดงเดือนจริง
+function updateTabLabel(brand, nm) {
+  const MN_SHORT = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+  const label = `สินค้า ${MN_SHORT[nm-1]}`; // เช่น "สินค้า พ.ค."
+  navTabs.querySelectorAll(`.tab-btn[data-brand="${brand}"]`).forEach((btn, i) => {
+    if (i === 1) btn.textContent = label;
+  });
+}
+
 const navTabs     = document.getElementById('navTabs');
 const mainContent = document.getElementById('mainContent');
 
@@ -1666,6 +1703,7 @@ function reRenderAll(brand) {
            : brand==='croc' ? (crocData ? getLastMonth({monthlyTotals: parseCrocData().monthlyTotals}) : 5)
            : getLastMonth(sikaDataLive);
   updateFooter(nm);
+  updateTabLabel(brand, nm);
 }
 
 function renderPage(brand, idx, divEl) {
