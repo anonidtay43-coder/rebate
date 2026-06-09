@@ -365,20 +365,29 @@ function parseQCCSV(csvText) {
   const BAG_COLS  = [1, 3, 5, 7, 9];
   const SALE_COLS = [2, 4, 6, 8, 10];
 
+  // DEBUG: log 5 แถวแรกเพื่อดู structure จริง
+  console.log('[QC CSV] จำนวนแถวทั้งหมด:', rows.length);
+  rows.slice(0,5).forEach((r,i) => console.log(`[QC CSV] row${i}:`, JSON.stringify(r.slice(0,5))));
+
   const products = [];
   let i = 0;
   while (i < rows.length) {
     const row = rows[i];
     const a = (row[0]||'').trim();
     const b = (row[1]||'').trim();
+    // ลอง match ทุกรูปแบบ: 'จำนวน', col B มีข้อความ, หรือ col A มีชื่อสินค้า
+    const isHeader = b.includes('จำนวน') || b.includes('จำนวน\r') || (b !== '' && !b.match(/^\d/) && !a.includes('เดือน'));
     if (b.includes('จำนวน')) {
-      const unit = b.replace('จำนวน','').trim();
+      const unit = b.replace(/จำนวน/g,'').trim();
       const name = a;
       const monthly = {}, bags = {};
       YEARS_Q.forEach(y => { monthly[y] = new Array(12).fill(0); bags[y] = new Array(12).fill(0); });
       for (let m = 0; m < 12; m++) {
         const dr = rows[i + 1 + m];
-        if (!dr || !dr[0] || !dr[0].includes('เดือน')) break;
+        if (!dr || !dr[0]) break;
+        const label = (dr[0]||'').trim();
+        // รองรับทั้ง 'เดือน1', 'เดือน 1', '1', หรือ label อื่นๆ
+        if (!label.includes('เดือน') && !label.match(/^\d+$/)) break;
         YEARS_Q.forEach((y, yi) => {
           const bv = parseFloat((dr[BAG_COLS[yi]]||'0').replace(/,/g,'')) || 0;
           const sv = parseFloat((dr[SALE_COLS[yi]]||'0').replace(/,/g,'')) || 0;
@@ -392,6 +401,7 @@ function parseQCCSV(csvText) {
     }
     i++;
   }
+  console.log('[QC CSV] parse ได้ products:', products.length, products.map(p=>p.name));
 
   const monthlyTotals = {}, yearlyTotals = {};
   YEARS_Q.forEach(y => { monthlyTotals[y] = new Array(12).fill(0); });
