@@ -369,26 +369,27 @@ function parseQCCSV(csvText) {
   let i = 0;
   while (i < rows.length) {
     const row = rows[i];
-    const a = (row[0]||'').trim().replace(/\xa0/g,' ');
+    const a = (row[0]||'').replace(/\xa0/g,' ').trim();
     const b = (row[1]||'').trim();
-    // header row: col B = 'จำนวนถุง' หรือ 'จำนวน...' (รองรับทุก unit)
-    if (b.startsWith('จำนวน')) {
+    // product header: col B มี 'จำนวน' (จำนวนถุง, จำนวนถัง ฯลฯ)
+    if (b.includes('จำนวน') && a && !a.includes('เดือน')) {
       const unit = b.replace('จำนวน','').trim() || 'ถุง';
       const name = a;
       const monthly = {}, bags = {};
       YEARS_Q.forEach(y => { monthly[y] = new Array(12).fill(0); bags[y] = new Array(12).fill(0); });
+      // อ่าน 12 เดือนถัดไป
       for (let m = 0; m < 12; m++) {
         const dr = rows[i + 1 + m];
-        if (!dr || !(dr[0]||'').toString().includes('เดือน')) break;
+        if (!dr || !(dr[0]||'').includes('เดือน')) break;
         YEARS_Q.forEach((y, yi) => {
-          const bv = parseFloat((dr[BAG_COLS[yi]]||'0').toString().replace(/,/g,'')) || 0;
-          const sv = parseFloat((dr[SALE_COLS[yi]]||'0').toString().replace(/,/g,'')) || 0;
+          const bv = parseFloat((dr[BAG_COLS[yi]]||'0').replace(/,/g,'')) || 0;
+          const sv = parseFloat((dr[SALE_COLS[yi]]||'0').replace(/,/g,'').replace(/-/g,'0')) || 0;
           bags[y][m] = bv;
           monthly[y][m] = sv;
         });
       }
       products.push({ name, unit, monthly, bags });
-      i += 14;
+      i += 13; // ข้าม 12 เดือน (scan ต่อจะเจอ header ถัดไปเอง)
       continue;
     }
     i++;
@@ -898,62 +899,46 @@ function parseCrocCSV(csvText) {
   const lines = csvText.trim().split('\n');
   const rows = lines.map(parseCSVLine);
 
-  // สรุปดูง่าย format:
-  // row0: กลุ่ม, ปี2565, '', ปี2566, '', ปี2567, '', ปี2568, '', ปี2569, ''
-  // row1: ชื่อสินค้า, ถุง/กระปุก/ชุด/แกลลอน, ยอด, ถุง, ยอด, ถุง, ยอด, ถุง, ยอด, ถุง, ยอด
-  // row2-13: เดือน1-12, qty65, amt65, qty66, amt66, qty67, amt67, qty68, amt68, qty69, amt69
-  // row14: รวม (skip)
-  // row15-16: blank
-  // row17: กลุ่ม (ซ้ำ)
-  // row18: ชื่อสินค้าถัดไป ...
-
   const YEARS_C = ['2565','2566','2567','2568','2569'];
-  // col index: bags=[1,3,5,7,9], sales=[2,4,6,8,10]
   const BAG_COLS_C  = [1, 3, 5, 7, 9];
   const SALE_COLS_C = [2, 4, 6, 8, 10];
+  const UNIT_VALS = ['ถุง','กระปุก','แกลลอน','ชุด','ถัง'];
 
   const products_c = [];
   let currentGroup = '';
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
-    const a = (row[0]||'').toString().trim();
-    const b = (row[1]||'').toString().trim();
-    const c = (row[2]||'').toString().trim();
+    const a = (row[0]||'').replace(/\xa0/g,' ').trim();
+    const b = (row[1]||'').trim();
+    const c = (row[2]||'').trim();
 
-    // แถว group header: col A = ชื่อกลุ่ม, col B = 'ปี 2565' หรือ 'ถุง'/'กระปุก' ไม่ใช่
-    // product header: col B = unit (ถุง, กระปุก, แกลลอน, ชุด) และ col C = 'ยอด'
-    const isUnit = ['ถุง','กระปุก','แกลลอน','ชุด','ถัง'].includes(b);
-    if (isUnit && c === 'ยอด' && a && !a.includes('เดือน')) {
-      // นี่คือ product header row
+    // product header: col B = unit และ col C = 'ยอด'
+    if (UNIT_VALS.includes(b) && (c === 'ยอด' || c === 'ยอดซื้อ') && a && !a.includes('เดือน')) {
       const name = a;
       const unit = b;
       const monthly = {}, bags = {};
       YEARS_C.forEach(y => { monthly[y] = new Array(12).fill(0); bags[y] = new Array(12).fill(0); });
-
       for (let m = 0; m < 12; m++) {
         const dr = rows[i + 1 + m];
-        if (!dr || !(dr[0]||'').toString().includes('เดือน')) break;
+        if (!dr || !(dr[0]||'').includes('เดือน')) break;
         YEARS_C.forEach((y, yi) => {
-          const bRaw = (dr[BAG_COLS_C[yi]]||'0').toString().replace(/,/g,'');
-          const sRaw = (dr[SALE_COLS_C[yi]]||'0').toString().replace(/,/g,'').replace(/-/g,'0');
-          bags[y][m]    = parseFloat(bRaw) || 0;
-          monthly[y][m] = parseFloat(sRaw) || 0;
+          bags[y][m]    = parseFloat((dr[BAG_COLS_C[yi]]||'0').replace(/,/g,'')) || 0;
+          monthly[y][m] = parseFloat((dr[SALE_COLS_C[yi]]||'0').replace(/,/g,'').replace(/-/g,'0')) || 0;
         });
       }
-      // หา group จาก row ก่อนหน้า (ที่ col B = 'ปี 2565')
       products_c.push({ group: currentGroup, name, unit, monthly, bags });
-      i += 13; // ข้าม 12 เดือน + 1 แถวรวม = 13
+      i += 12;
       continue;
     }
 
-    // แถว group: col B = 'ปี 2565' หรือ col A มีชื่อกลุ่ม และ col B ไม่ใช่ unit
-    if (a && (b === 'ปี 2565' || b.startsWith('ปี '))) {
+    // group header: col A = ชื่อกลุ่ม, col B = 'ปี 2565'
+    if (a && (b === 'ปี 2565' || b.startsWith('ปี ')) && !a.includes('เดือน')) {
       currentGroup = a === 'กาวยาแนว' ? 'ยาแนว' : a;
     }
   }
 
-  console.log('[CROC CSV] parse ได้ products:', products_c.length, products_c.map(p=>p.group+'/'+p.name.slice(0,10)));
+  console.log('[CROC CSV] parse ได้ products:', products_c.length);
 
   const GROUPS_C = ['กาวซีเมนต์','เคมีก่อสร้าง','ยาแนว'];
   const monthlyTotals_c = {}, yearlyTotals_c = {}, bimonthlyByGroup_c = {};
@@ -968,19 +953,16 @@ function parseCrocCSV(csvText) {
     YEARS_C.forEach(y => {
       p.monthly[y].forEach((v, m) => {
         monthlyTotals_c[y][m] += v;
-        const g = p.group;
-        if (bimonthlyByGroup_c[g]) bimonthlyByGroup_c[g][y][Math.floor(m/2)] += v;
+        if (bimonthlyByGroup_c[p.group]) bimonthlyByGroup_c[p.group][y][Math.floor(m/2)] += v;
       });
     });
   });
   YEARS_C.forEach(y => { yearlyTotals_c[y] = monthlyTotals_c[y].reduce((a,b) => a+b, 0); });
 
   return {
-    monthlyTotals: monthlyTotals_c,
-    yearlyTotals: yearlyTotals_c,
+    monthlyTotals: monthlyTotals_c, yearlyTotals: yearlyTotals_c,
     rebateSummary: CROC_DATA_EMBED.rebateSummary,
-    products: products_c,
-    bimonthlyByGroup: bimonthlyByGroup_c
+    products: products_c, bimonthlyByGroup: bimonthlyByGroup_c
   };
 }
 
