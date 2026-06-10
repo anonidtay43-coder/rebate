@@ -561,20 +561,21 @@ function buildPage1() {
     </div>`;
   }).join('');
 
-  // NM-month strip — เปรียบเทียบทุกปี
-  const fNM = y => (mTot[String(y)]||mTot[y]||Array(12).fill(0)).slice(0,NM).reduce((a,b)=>a+b,0);
-  const fN = {}; YEARS.forEach(y => fN[y] = fNM(y));
+  // ยอดรวม ม.ค.–ธ.ค. ทุกปี (เต็มปี; ปี 2569 ใช้เท่าที่มีจริง)
+  const fFull = y => (mTot[String(y)]||mTot[y]||Array(12).fill(0)).slice(0,12).reduce((a,b)=>a+b,0);
+  const fN = {}; YEARS.forEach(y => fN[y] = fFull(y));
   const fmStrip = YEARS.map(y=>{
     const v = fN[y]; const prev = fN[y-1];
     const chg = prev ? pChange(prev,v) : null;
     const col = YR_COL[y];
+    const sub = y===lastY ? `<div class="fm-sub" style="color:var(--muted);font-size:12px;margin-top:2px">${NM} เดือน</div>` : '';
     const badge = chg !== null
       ? `<span class="fm-badge ${chg>=0?'up':'down'}">${chg>=0?'+':''}${(chg*100).toFixed(1)}%</span>`
       : '';
     return `<div class="fm-card" style="${y===lastY?'border-color:'+col:''}">
       <div class="fm-year" style="color:${col}">ปี ${y}</div>
       <div class="fm-val" style="color:${col}">${fmtM(v)}</div>
-      ${badge}
+      ${sub}${badge}
     </div>`;
   }).join('');
 
@@ -647,7 +648,7 @@ function buildPage1() {
   <div class="page-title">แดชบอร์ด ควิกโค้ท</div>
   <div class="page-sub">ยอดซื้อรวมทุกรายการ ปี 2565–2569</div>
 
-  <div class="section-title">ยอดซื้อ ${nmLabel(NM)} เทียบทุกปี</div>
+  <div class="section-title">ยอดซื้อ ม.ค.–ธ.ค. เทียบทุกปี</div>
   <div class="four-month-strip">${fmStrip}</div>
 
   <div class="section-title">สรุปรีเบท</div>
@@ -1021,12 +1022,13 @@ function buildCrocPage1(){
     return `<div class="bar-group"><div class="bar" style="height:${h}%;background:${colFor(y)}" data-tip="ปี ${y}: ${fmtM(v)}"></div><div class="bar-label" style="color:${colFor(y)}">'${String(y).slice(2)}</div><div class="bar-val">${fmtM(v)}</div></div>`;
   }).join('');
 
-  const fNM = y=>(mTot[y]||Array(12).fill(0)).slice(0,NM).reduce((a,b)=>a+b,0);
-  const fN={}; CY.forEach(y=>fN[y]=fNM(y));
+  const fFull=y=>(mTot[y]||Array(12).fill(0)).slice(0,12).reduce((a,b)=>a+b,0);
+  const fN={}; CY.forEach(y=>fN[y]=fFull(y));
   const fmStrip=CY.map(y=>{
     const v=fN[y],prev=fN[y-1]; const chg=prev?pChange(prev,v):null; const col=colFor(y);
+    const sub=y===lastY?`<div class="fm-sub" style="color:var(--muted);font-size:12px;margin-top:2px">${NM} เดือน</div>`:'';
     const badge=chg!==null?`<span class="fm-badge ${chg>=0?'up':'down'}">${chg>=0?'+':''}${(chg*100).toFixed(1)}%</span>`:'';
-    return `<div class="fm-card"><div class="fm-year" style="color:${col}">ปี ${y}</div><div class="fm-val" style="color:${col}">${fmtM(v)}</div>${badge}</div>`;
+    return `<div class="fm-card"><div class="fm-year" style="color:${col}">ปี ${y}</div><div class="fm-val" style="color:${col}">${fmtM(v)}</div>${sub}${badge}</div>`;
   }).join('');
 
   // ราย 2 เดือน คำนวณจาก live
@@ -1091,7 +1093,7 @@ function buildCrocPage1(){
   return `
   <div class="page-title">แดชบอร์ด จระเข้</div>
   <div class="page-sub">ยอดซื้อรวมทุกรายการ ปี ${CY[0]}–${lastY}</div>
-  <div class="section-title">ยอดซื้อ ${nmLabel(NM)} เทียบทุกปี</div><div class="four-month-strip">${fmStrip}</div>
+  <div class="section-title">ยอดซื้อ ม.ค.–ธ.ค. เทียบทุกปี</div><div class="four-month-strip">${fmStrip}</div>
   ${rebCards}
   <div class="chart-wrap"><div class="chart-title">ยอดซื้อรายปี (บาท)</div><div class="chart-legend">${legend}</div><div class="bar-chart">${yBars}</div></div>
   <div class="section-title">ราย 2 เดือน (รวมทุกกลุ่ม)</div>
@@ -1333,12 +1335,13 @@ function buildSikaPage1() {
     return `<div class="stat-card"><div class="year-label" style="color:${col}">ปี ${y}</div><div class="value" style="color:${col}">${fmtM(v)}</div><div class="sub">บาท</div>${badge}</div>`;
   }).join('');
 
-  const fNM = y => (mTot[String(y)]||mTot[y]||Array(12).fill(0)).slice(0,NM).reduce((a,b)=>a+b,0);
-  const fN = {}; CY.forEach(y=>fN[y]=fNM(y));
+  const fFull = y => (mTot[String(y)]||mTot[y]||Array(12).fill(0)).slice(0,12).reduce((a,b)=>a+b,0);
+  const fN = {}; CY.forEach(y=>fN[y]=fFull(y));
   const fmStrip = CY.map(y=>{
     const v=fN[y], prev=fN[y-1]; const chg=prev?pChange(prev,v):null; const col=colFor(y);
+    const sub=y===lastY?`<div class="fm-sub" style="color:var(--muted);font-size:12px;margin-top:2px">${NM} เดือน</div>`:'';
     const badge=chg!==null?`<span class="fm-badge ${chg>=0?'up':'down'}">${chg>=0?'+':''}${(chg*100).toFixed(1)}%</span>`:'';
-    return `<div class="fm-card"><div class="fm-year" style="color:${col}">ปี ${y}</div><div class="fm-val" style="color:${col}">${fmtM(v)}</div>${badge}</div>`;
+    return `<div class="fm-card"><div class="fm-year" style="color:${col}">ปี ${y}</div><div class="fm-val" style="color:${col}">${fmtM(v)}</div>${sub}${badge}</div>`;
   }).join('');
 
   const yBarData = CY.map(y => y===lastY ? y69live : (sikaDataLive.yearlyTotals[String(y)]||sikaDataLive.yearlyTotals[y]||0));
@@ -1378,7 +1381,7 @@ function buildSikaPage1() {
   return `
   <div class="page-title">แดชบอร์ด ซิก้าแลงโก้</div>
   <div class="page-sub">ยอดซื้อรวมทุกรายการ ปี 2565–2569</div>
-  <div class="section-title">ยอดซื้อ ${nmLabel(NM)} เทียบทุกปี</div><div class="four-month-strip">${fmStrip}</div>
+  <div class="section-title">ยอดซื้อ ม.ค.–ธ.ค. เทียบทุกปี</div><div class="four-month-strip">${fmStrip}</div>
   <div class="section-title">สรุปรีเบท</div>
   <div class="rebate-summary" style="grid-template-columns:repeat(3,1fr)">${rebCards}</div>
   <div class="chart-wrap"><div class="chart-title">ยอดซื้อรายปี (บาท)</div><div class="chart-legend">${legend}</div><div class="bar-chart">${yBars}</div></div>
