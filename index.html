@@ -1188,6 +1188,14 @@ function buildCrocPage2(){
 // ══════════════════════════════════════════════
 // ── SIKA DATA ──
 // ══════════════════════════════════════════════
+const SIKA_SHEET_ID = '1Rn5wDBvdNDog_gnxZjbQ08dxurWphqrH4u1MENmXLeM';
+const SIKA_GID      = '401787243';
+const SIKA_API      = `https://docs.google.com/spreadsheets/d/${SIKA_SHEET_ID}/export?format=csv&gid=${SIKA_GID}`;
+const SIKA_YEARS    = [2565, 2566, 2567, 2568, 2569];
+
+let sikaDataLive = null;
+let sikaLoading  = false;
+
 const SIKA_GROUPS = ['เคมีก่อสร้าง'];
 const SIKA_GROUP_COL = {'เคมีก่อสร้าง':'#e07b1e'};
 const YR_COL_S = {2565:'#6366f1',2566:'#0ea5e9',2567:'#10b981',2568:'#e07b1e',2569:'#d97706'};
@@ -1250,7 +1258,26 @@ function parseSikaCSV(csvText) {
   });
   YEARS_S.forEach(y => { yearlyTotals[y] = monthlyTotals[y].reduce((a,b) => a+b, 0); });
 
-  return { products, monthlyTotals, yearlyTotals, rebateSummary: {} };
+  // ── parse rebateSummary ──
+  const rebateSummary = {};
+  for (let ri = 0; ri < rows.length; ri++) {
+    const cell0 = (rows[ri][0]||'').trim();
+    if (cell0.includes('\u0e23\u0e27\u0e21\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14\u0e44\u0e14\u0e49\u0e23\u0e35\u0e40\u0e1a\u0e17')) {
+      const totals = [rows[ri][1], rows[ri][2], rows[ri][3]];
+      let pcts = ['','',''];
+      if (ri+1 < rows.length && (rows[ri+1][0]||'').includes('\u0e04\u0e34\u0e14\u0e40\u0e1b\u0e47\u0e19\u0e40\u0e1b\u0e2d\u0e23\u0e4c\u0e40\u0e0b\u0e47\u0e19')) {
+        pcts = [rows[ri+1][1], rows[ri+1][2], rows[ri+1][3]];
+      }
+      [2567,2568,2569].forEach((yr,idx) => {
+        const t = parseFloat((totals[idx]||'0').replace(/,/g,'')) || 0;
+        const p = parseFloat((pcts[idx]||'0').replace(/,/g,'')) || null;
+        if (t > 0 || p) rebateSummary[yr] = { total: t, pct: p };
+      });
+      break;
+    }
+  }
+
+  return { products, monthlyTotals, yearlyTotals, rebateSummary };
 }
 
 function loadSikaData() {
