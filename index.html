@@ -44,32 +44,10 @@ body {
   background: rgba(255,255,255,0.97);
   backdrop-filter: blur(12px);
   border-bottom: 2px solid var(--border);
-  padding: 8px 16px 0;
-  display: flex; flex-direction: column; gap: 0;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
-}
-.topbar-row1 {
+  padding: 0 16px;
   display: flex; align-items: center; justify-content: space-between;
-  padding-bottom: 7px;
-}
-.topbar-row2 {
-  border-top: 1px solid var(--border);
-  padding: 5px 0 6px;
-}
-.topbar-row3 {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  background: linear-gradient(90deg,#dcfce7,#bbf7d0);
-  border-top: 1px solid #86efac;
-  margin: 0 -16px;
-  padding: 7px 16px;
-}
-#bannerLabel { font-size: 13px; color: #15803d; font-weight: 600; }
-.banner-btn {
-  background: #16a34a; color: #fff;
-  font-family: var(--font); font-size: 13px; font-weight: 700;
-  padding: 6px 14px; border-radius: 20px;
-  text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
-  white-space: nowrap; box-shadow: 0 1px 4px rgba(22,163,74,.4); flex-shrink: 0;
+  height: 52px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
 }
 .brand { font-size: 17px; font-weight: 700; letter-spacing: .5px; color: var(--accent); }
 .brand span { color: var(--text); font-weight: 300; }
@@ -294,23 +272,19 @@ footer {
 </head>
 <body>
 <div class="topbar">
-  <div class="topbar-row1">
-    <div class="brand-switcher">
-      <button class="brand-pill active" id="brandQC" onclick="switchBrand('qc')">ควิก<span>โค้ท</span></button>
-      <button class="brand-pill" id="brandCROC" onclick="switchBrand('croc')">จระ<span>เข้</span></button>
-      <button class="brand-pill" id="brandSIKA" onclick="switchBrand('sika')">ซิก้า<span>/แลงโก้</span></button>
-    </div>
+  <div class="brand-switcher">
+    <button class="brand-pill active" id="brandQC" onclick="switchBrand('qc')">ควิก<span>โค้ท</span></button>
+    <button class="brand-pill" id="brandCROC" onclick="switchBrand('croc')">จระ<span>เข้</span></button>
+    <button class="brand-pill" id="brandSIKA" onclick="switchBrand('sika')">ซิก้า<span>/แลงโก้</span></button>
   </div>
-  <div class="topbar-row2">
-    <nav class="nav-tabs" id="navTabs"></nav>
-  </div>
-  <div id="dataBanner" class="topbar-row3">
-    <span id="bannerLabel">📊 ดูข้อมูลดิบ สินค้าควิกโค้ทใน Google Sheets</span>
-    <a id="bannerLink" href="https://docs.google.com/spreadsheets/d/1aKR6KmUGosext5SE1d92VF-CVEHeCJEFfM_IvHE6gzY/edit?gid=246191077#gid=246191077" target="_blank" rel="noopener" class="banner-btn">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      เปิด Google Sheet
-    </a>
-  </div>
+  <nav class="nav-tabs" id="navTabs"></nav>
+</div>
+<div id="dataBanner" style="background:linear-gradient(90deg,#dcfce7,#bbf7d0); border-bottom:2px solid #86efac; padding:8px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+  <span id="bannerLabel" style="font-size:12px; color:#15803d; font-weight:600;">📊 ดูข้อมูลดิบ สินค้าควิกโค้ทใน Google Sheets</span>
+  <a id="bannerLink" href="https://docs.google.com/spreadsheets/d/1aKR6KmUGosext5SE1d92VF-CVEHeCJEFfM_IvHE6gzY/edit?gid=246191077#gid=246191077" target="_blank" rel="noopener" style="background:#16a34a;color:#fff;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;box-shadow:0 1px 4px rgba(22,163,74,.4)">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    เปิด Google Sheet
+  </a>
 </div>
 <main id="mainContent"></main>
 <footer id="footerEl">ข้อมูล ณ เดือนพ.ค. 2569 &nbsp;|&nbsp; หน่วย: บาท (ไม่รวม VAT)</footer>
@@ -365,7 +339,8 @@ function updateFooter(nm) {
 // ── QUICKCOAT DATA ──
 // ══════════════════════════════════════════════
 const QC_SHEET_ID = '1aKR6KmUGosext5SE1d92VF-CVEHeCJEFfM_IvHE6gzY';
-const QC_API = `https://docs.google.com/spreadsheets/d/${QC_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=สรุปดูง่าย`;
+const QC_GID = '246191077';
+const QC_API = `https://docs.google.com/spreadsheets/d/${QC_SHEET_ID}/export?format=csv&gid=${QC_GID}`;
 
 let qcDataLive = null;
 let qcLoading = false;
@@ -415,18 +390,25 @@ function parseQCCSV(csvText) {
       const name = a;
       const monthly = {}, bags = {};
       YEARS_Q.forEach(y => { monthly[y] = new Array(12).fill(0); bags[y] = new Array(12).fill(0); });
-      for (let m = 0; m < 12; m++) {
-        const dr = rows[i + 1 + m];
-        if (!dr || !(dr[0]||'').includes('เดือน')) break;
+      // อ่าน 12 เดือนถัดไป — ข้าม row ว่างหรือ row ที่ไม่ใช่เดือน
+      let m = 0;
+      let j = i + 1;
+      while (m < 12 && j < rows.length) {
+        const dr = rows[j];
+        const da = (dr[0]||'').trim();
+        if (!da) { j++; continue; } // ข้าม row ว่าง
+        if (!da.includes('เดือน')) break; // หมดข้อมูลสินค้านี้แล้ว
         YEARS_Q.forEach((y, yi) => {
-          const bRaw = (dr[BAG_COLS[yi]]||'').replace(/,/g,'').replace(/-/g,'0').trim();
-          const sRaw = (dr[SALE_COLS[yi]]||'').replace(/,/g,'').replace(/-/g,'0').trim();
+          const bRaw = (dr[BAG_COLS[yi]]||'').toString().replace(/,/g,'').replace(/^-+$/,'0').replace(/^=.*$/,'0').trim();
+          const sRaw = (dr[SALE_COLS[yi]]||'').toString().replace(/,/g,'').replace(/^-+$/,'0').replace(/^=.*$/,'0').trim();
           bags[y][m]    = parseFloat(bRaw) || 0;
           monthly[y][m] = parseFloat(sRaw) || 0;
         });
+        m++;
+        j++;
       }
       products.push({ name, unit, monthly, bags });
-      i += 13;
+      i = j - 1;
       continue;
     }
     i++;
@@ -501,7 +483,7 @@ function loadQCData() {
     .then(csv => {
       try {
         const data = parseQCCSV(csv);
-        if (!data.products || data.products.length < 3) throw new Error('parse failed: products=' + (data.products||[]).length);
+        if (!data.products || data.products.length < 1) throw new Error('parse failed: products=' + (data.products||[]).length);
         qcLoading = false;
         qcDataLive = data;
         console.log('[QC] live fetch สำเร็จ lastMonth=', data.lastMonth2569, 'products=', data.products.length);
@@ -937,7 +919,8 @@ function buildPage2() {
 // ── CROC DATA ──
 // ══════════════════════════════════════════════
 const CROC_SHEET_ID = '1ru3ctlBD9jaHE62NOUk6Dcdh-tP5cXqzzXhwW0hsjK4';
-const CROC_API = `https://docs.google.com/spreadsheets/d/${CROC_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=สรุปดูง่าย`;
+const CROC_GID = '1779795165';
+const CROC_API = `https://docs.google.com/spreadsheets/d/${CROC_SHEET_ID}/export?format=csv&gid=${CROC_GID}`;
 
 let crocData = null;
 let crocLoading = false;
@@ -969,7 +952,7 @@ function parseCrocCSV(csvText) {
   const SALE_COLS_C = [2, 4, 6, 8, 10];
   const UNIT_VALS = ['ถุง','กระปุก','แกลลอน','ชุด','ถัง'];
 
-  // debug: log first 5 rows
+  // debug: log first 3 rows
   console.log('[CROC CSV] first 3 rows:', rows.slice(0,3).map(r=>r.slice(0,6)));
 
   const products_c = [];
@@ -981,14 +964,14 @@ function parseCrocCSV(csvText) {
     const b = (row[1]||'').trim();
     const c = (row[2]||'').trim();
 
-    // group header: col A = ชื่อกลุ่ม, col B = 'ปี 2565' หรือ 'ปี'
-    if (a && (b === 'ปี 2565' || b.startsWith('ปี ')) && !a.includes('เดือน') && !a.includes('รวม')) {
-      const grp = a.replace('กาวยาแนว','ยาแนว').trim();
-      currentGroup = grp;
+    // group header: col A = ชื่อกลุ่ม, col B = 'ปี 2565' หรือ 'ถุง' (header สินค้าแรกของกลุ่ม)
+    // หรือ col A = group name โดยไม่มี col B
+    const knownGroups = ['กาวซีเมนต์','เคมีก่อสร้าง','กาวยาแนว','ยาแนว'];
+    if (a && knownGroups.some(g => a.includes(g)) && !a.includes('เดือน') && !a.includes('รวม')) {
+      currentGroup = a.replace('กาวยาแนว','ยาแนว').trim();
     }
 
     // product header: col B = unit และ col C = 'ยอด'/'ยอดซื้อ'
-    // รองรับกรณี CSV encode unit ต่างออกมาด้วย includes
     const bIsUnit = UNIT_VALS.includes(b) || UNIT_VALS.some(u => b.includes(u));
     const cIsYod = (c === 'ยอด' || c === 'ยอดซื้อ' || c.includes('ยอด'));
     if (bIsUnit && cIsYod && a && !a.includes('เดือน') && !a.includes('รวม') && !a.includes('ปี ')) {
@@ -996,18 +979,25 @@ function parseCrocCSV(csvText) {
       const unit = b;
       const monthly = {}, bags = {};
       YEARS_C.forEach(y => { monthly[y] = new Array(12).fill(0); bags[y] = new Array(12).fill(0); });
-      for (let m = 0; m < 12; m++) {
-        const dr = rows[i + 1 + m];
-        if (!dr || !(dr[0]||'').includes('เดือน')) break;
+      // อ่าน 12 เดือนถัดไป — ข้าม row ว่างหรือ row ที่ไม่ใช่เดือน
+      let m = 0;
+      let j = i + 1;
+      while (m < 12 && j < rows.length) {
+        const dr = rows[j];
+        const da = (dr[0]||'').trim();
+        if (!da) { j++; continue; } // ข้าม row ว่าง
+        if (!da.includes('เดือน')) break; // หมดข้อมูลสินค้านี้แล้ว
         YEARS_C.forEach((y, yi) => {
-          const bRaw = (dr[BAG_COLS_C[yi]]||'').replace(/,/g,'').replace(/-/g,'0').trim();
-          const sRaw = (dr[SALE_COLS_C[yi]]||'').replace(/,/g,'').replace(/-/g,'0').trim();
+          const bRaw = (dr[BAG_COLS_C[yi]]||'').toString().replace(/,/g,'').replace(/^-+$/,'0').trim();
+          const sRaw = (dr[SALE_COLS_C[yi]]||'').toString().replace(/,/g,'').replace(/^-+$/,'0').trim();
           bags[y][m]    = parseFloat(bRaw) || 0;
           monthly[y][m] = parseFloat(sRaw) || 0;
         });
+        m++;
+        j++;
       }
       products_c.push({ group: currentGroup, name, unit, monthly, bags });
-      i += 12;
+      i = j - 1; // กระโดดไป row ล่าสุดที่อ่าน
       continue;
     }
   }
@@ -1090,7 +1080,7 @@ function loadCrocData() {
     .then(csv => {
       try {
         const data = parseCrocCSV(csv);
-        if (!data.products || data.products.length < 5) throw new Error('parse failed: products=' + (data.products||[]).length);
+        if (!data.products || data.products.length < 1) throw new Error('parse failed: products=' + (data.products||[]).length);
         console.log('[CROC] live fetch สำเร็จ products=', data.products.length);
         crocLoading = false;
         onCrocLoaded(data);
@@ -1329,7 +1319,8 @@ function buildCrocPage2(){
 // ══════════════════════════════════════════════
 const SIKA_YEARS = [2565,2566,2567,2568,2569];
 const SIKA_SHEET_ID = '1Rn5wDBvdNDog_gnxZjbQ08dxurWphqrH4u1MENmXLeM';
-const SIKA_API = `https://docs.google.com/spreadsheets/d/${SIKA_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=สรุปดูง่าย`;
+const SIKA_GID = '401787243';
+const SIKA_API = `https://docs.google.com/spreadsheets/d/${SIKA_SHEET_ID}/export?format=csv&gid=${SIKA_GID}`;
 
 let sikaDataLive = null;
 let sikaLoading = false;
@@ -1487,7 +1478,7 @@ function loadSikaData() {
     .then(csv => {
       try {
         const data = parseSikaCSV(csv);
-        if (!data.products || data.products.length < 5) throw new Error('parse failed: products=' + (data.products||[]).length);
+        if (!data.products || data.products.length < 1) throw new Error('parse failed: products=' + (data.products||[]).length);
         sikaLoading = false;
         sikaDataLive = data;
         const nm = (data.monthlyTotals?.['2569']||[]).reduce((l,v,i)=>v>0?i+1:l,0)||4;
