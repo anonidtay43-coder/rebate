@@ -647,11 +647,13 @@ function buildPage1() {
   <div class="page-title">แดชบอร์ด ควิกโค้ท</div>
   <div class="page-sub">ยอดซื้อรวมทุกรายการ ปี 2565–2569</div>
 
-  <div class="section-title">ยอดรวมรายปี</div>
-  <div class="stat-grid">${yearCards}</div>
-
   <div class="section-title">ยอดซื้อ ${nmLabel(NM)} เทียบทุกปี</div>
   <div class="four-month-strip">${fmStrip}</div>
+
+  <div class="section-title">สรุปรีเบท</div>
+  <div class="rebate-summary">${rebCards}</div>
+
+  <div class="chart-wrap"><div class="chart-title">ยอดซื้อรายปี (บาท)</div><div class="chart-legend">${legend}</div><div class="bar-chart">${yBars}</div></div>
 
   <div class="section-title">รายไตรมาส</div>
   <div class="tbl-wrap"><table>
@@ -664,9 +666,6 @@ function buildPage1() {
     <thead><tr><th>เดือน</th>${YEARS.map(y=>`<th class="${y===lastY?'yr2569':''}">${y}</th>`).join('')}<th>68→69</th></tr></thead>
     <tbody>${mRows}</tbody>
   </table></div>
-
-  <div class="section-title">สรุปรีเบท</div>
-  <div class="rebate-summary">${rebCards}</div>
   `;
 }
 
@@ -1092,8 +1091,8 @@ function buildCrocPage1(){
   return `
   <div class="page-title">แดชบอร์ด จระเข้</div>
   <div class="page-sub">ยอดซื้อรวมทุกรายการ ปี ${CY[0]}–${lastY}</div>
-  <div class="section-title">ยอดรวมรายปี</div><div class="stat-grid">${yearCards}</div>
   <div class="section-title">ยอดซื้อ ${nmLabel(NM)} เทียบทุกปี</div><div class="four-month-strip">${fmStrip}</div>
+  ${rebCards}
   <div class="chart-wrap"><div class="chart-title">ยอดซื้อรายปี (บาท)</div><div class="chart-legend">${legend}</div><div class="bar-chart">${yBars}</div></div>
   <div class="section-title">ราย 2 เดือน (รวมทุกกลุ่ม)</div>
   <div class="note">ปี ${lastY}: มีข้อมูล ${nmLabel(NM)}</div>
@@ -1101,7 +1100,7 @@ function buildCrocPage1(){
   <div class="section-title">ราย 2 เดือน แยกกลุ่มสินค้า</div>${groupBmTables}
   <div class="section-title">รายเดือน</div>
   <div class="tbl-wrap"><table><thead><tr><th>เดือน</th>${CY.map(y=>`<th class="${y===lastY?'yr2569':''}">${y}</th>`).join('')}<th>68→69</th></tr></thead><tbody>${mRows}</tbody></table></div>
-  ${rebCards}`;
+  `;
 }
 
 function buildCrocPage2(){
@@ -1379,16 +1378,15 @@ function buildSikaPage1() {
   return `
   <div class="page-title">แดชบอร์ด ซิก้าแลงโก้</div>
   <div class="page-sub">ยอดซื้อรวมทุกรายการ ปี 2565–2569</div>
-  <div class="section-title">ยอดรวมรายปี</div><div class="stat-grid">${yearCards}</div>
   <div class="section-title">ยอดซื้อ ${nmLabel(NM)} เทียบทุกปี</div><div class="four-month-strip">${fmStrip}</div>
+  <div class="section-title">สรุปรีเบท</div>
+  <div class="rebate-summary" style="grid-template-columns:repeat(3,1fr)">${rebCards}</div>
   <div class="chart-wrap"><div class="chart-title">ยอดซื้อรายปี (บาท)</div><div class="chart-legend">${legend}</div><div class="bar-chart">${yBars}</div></div>
   <div class="section-title">รายไตรมาส</div>
   <div class="note">ปี 2565: เริ่มซื้อ Q3 | ปี 2569: มีข้อมูล ${nmLabel(NM)}</div>
   <div class="tbl-wrap"><table><thead><tr><th>ไตรมาส</th>${CY.map(y=>`<th class="${y===lastY?'yr2569':''}">${y}</th>`).join('')}<th>68→69</th></tr></thead><tbody>${qRows}</tbody></table></div>
   <div class="section-title">รายเดือน</div>
-  <div class="tbl-wrap"><table><thead><tr><th>เดือน</th>${CY.map(y=>`<th class="${y===lastY?'yr2569':''}">${y}</th>`).join('')}<th>68→69</th></tr></thead><tbody>${mRows}</tbody></table></div>
-  <div class="section-title">สรุปรีเบท</div>
-  <div class="rebate-summary" style="grid-template-columns:repeat(3,1fr)">${rebCards}</div>`;
+  <div class="tbl-wrap"><table><thead><tr><th>เดือน</th>${CY.map(y=>`<th class="${y===lastY?'yr2569':''}">${y}</th>`).join('')}<th>68→69</th></tr></thead><tbody>${mRows}</tbody></table></div>`;
 }
 
 function buildSikaPage2() {
