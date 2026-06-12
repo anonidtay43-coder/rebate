@@ -820,8 +820,10 @@ function parseCrocCSV(csvText) {
     const b = (row[1]||'').trim();
     const c = (row[2]||'').trim();
 
-    const knownGroups = ['กาวซีเมนต์','เคมีก่อสร้าง','กาวยาแนว','ยาแนว'];
-    if (a && knownGroups.some(g => a.includes(g)) && !a.includes('เดือน') && !a.includes('รวม') && !a.includes('ปี')) {
+    // group header: exact match เท่านั้น และ col B ต้องเป็น 'ปี...' หรือ blank (ไม่ใช่ unit)
+    const EXACT_GROUPS = ['กาวซีเมนต์','เคมีก่อสร้าง','กาวยาแนว','ยาแนว'];
+    const bIsYearOrBlank = !b || b.startsWith('ปี ');
+    if (a && EXACT_GROUPS.some(g => a === g || a === g + ' ') && bIsYearOrBlank && !a.includes('เดือน') && !a.includes('รวม')) {
       currentGroup = a.replace('กาวยาแนว','ยาแนว').trim();
     }
 
